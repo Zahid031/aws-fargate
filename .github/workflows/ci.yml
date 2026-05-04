@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-# All configurable variables go here
 env:
   AWS_REGION: us-east-1                 
   ECR_REPOSITORY: 704348946178.dkr.ecr.us-east-1.amazonaws.com/fastapi-fargate-prod    
@@ -13,9 +12,12 @@ env:
   ECS_SERVICE: fastapi-fargate-prod-service    
   ECS_CLUSTER: fastapi-fargate-prod-cluster    
 
-jobs:
-  build-and-deploy:
+
+build-and-push:
     runs-on: ubuntu-latest
+    # Expose the image URI to the next job
+    outputs:
+      image-uri: ${{ steps.build-image.outputs.image }}
 
     steps:
       - name: Checkout Code
@@ -40,7 +42,25 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
           docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          # Save the image URI to pass to the deploy job
           echo "image=$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  # JOB 2: DEPLOY (CD)
+  deploy:
+    runs-on: ubuntu-latest
+    # Deploy will ONLY run if build-and-push succeeds
+    needs: build-and-push
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Update Task Definition
         id: task-def
@@ -48,7 +68,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.image }}
+          image: ${{ needs.build-and-push.outputs.image-uri }}
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
