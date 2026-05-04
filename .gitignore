@@ -1,0 +1,14 @@
+.mypy_cache
+.venv
+__pycache__/
+.env
+.pytest_cache
+cert
+logs
+note.txt
+.terraform
+.terraform.lock.hcl
+deployment_list.txt
+.qodo
+.coverage
+htmlcov
