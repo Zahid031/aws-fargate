@@ -67,6 +67,7 @@ jobs:
             --query 'taskDefinition' \
             --output json > task-definition.json
 
+
       - name: Update Task Definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
