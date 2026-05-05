@@ -1,0 +1,19 @@
+# Copy to terraform.tfvars and fill in your values.
+# terraform.tfvars is gitignored — this file is what gets committed.
+
+aws_region   = "us-east-1"
+project_name = "fastapi-fargate"
+environment  = "prod"
+
+vpc_state_bucket = "tfstate-fastapi-fargate-REPLACE_ME"
+vpc_state_key    = "prod/vpc/terraform.tfstate"
+
+app_port          = 8000
+app_image_tag     = "latest"
+health_check_path = "/health"
+
+task_cpu    = 256
+task_memory = 512
+
+desired_count      = 2
+log_retention_days = 7
