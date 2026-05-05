@@ -1,38 +1,26 @@
-
 FROM python:3.13-slim
 
-# Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
 COPY pyproject.toml uv.lock ./
 
-RUN uv venv --python 3.13 .venv && \
-    uv sync --frozen
-
-# 👉 Install OpenTelemetry auto-instrumentation
-RUN . .venv/bin/activate && \
-    pip install opentelemetry-distro opentelemetry-instrumentation
+RUN uv venv /app/.venv --python 3.13 && \
+    uv sync --frozen --no-dev && \
+    uv pip install --python /app/.venv \
+        opentelemetry-distro \
+        opentelemetry-exporter-otlp
 
 COPY . .
 
 ENV PYTHONPATH=/app
-
-# 👉 OTEL environment variables (important)
-
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8000
 
-# 👉 Wrap with opentelemetry-instrument
-CMD ["/bin/bash", "-c", "source .venv/bin/activate && opentelemetry-instrument uvicorn src.main:app --host 0.0.0.0 --port 8000"]
-
-
-
-
-
-
-
+CMD ["opentelemetry-instrument", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 
 

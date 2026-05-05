@@ -9,6 +9,10 @@ dependencies = [
     "psycopg[binary]>=3.3.4",
     "python-ulid>=3.1.0",
     "sqlalchemy>=2.0.49",
+    "opentelemetry-distro>=0.46b0",
+    "opentelemetry-instrumentation>=0.46b0",
+    "opentelemetry-instrumentation-fastapi>=0.46b0",
+    "opentelemetry-exporter-otlp>=1.25.0",
 ]
 
 [dependency-groups]
