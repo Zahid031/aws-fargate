@@ -33,9 +33,10 @@
 
 # Use Python 3.13 slim image
 FROM python:3.13-slim
-
+RUN apt-get update && apt-get install -y curl 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 
 # Set working directory
 WORKDIR /app
@@ -58,3 +59,5 @@ EXPOSE 8000
 
 # Run application (without --reload for production)
 CMD ["/bin/bash", "-c", "source .venv/bin/activate && exec uvicorn src.main:app --host 0.0.0.0 --port 8000"]
+
+
