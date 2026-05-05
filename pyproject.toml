@@ -13,9 +13,19 @@ dependencies = [
     "opentelemetry-sdk==1.33.1",
     "opentelemetry-distro==0.54b1",
     "opentelemetry-instrumentation==0.54b1",
+    
+    # OpenTelemetry - Instrumentations (all compatible with Python 3.12)
     "opentelemetry-instrumentation-fastapi==0.54b1",
+    "opentelemetry-instrumentation-asgi==0.54b1",
+    "opentelemetry-instrumentation-sqlalchemy==0.54b1",
+    "opentelemetry-instrumentation-httpx==0.54b1",
+    "opentelemetry-instrumentation-psycopg2==0.54b1",  # For PostgreSQL tracing
+    
+    # OpenTelemetry - Exporters
     "opentelemetry-exporter-otlp==1.33.1",
     "opentelemetry-exporter-otlp-proto-grpc==1.33.1",
+    
+    # OpenTelemetry - Propagators (AWS X-Ray)
     "opentelemetry-propagator-aws-xray>=1.0.0",
 ]
 
