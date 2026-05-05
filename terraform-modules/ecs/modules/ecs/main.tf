@@ -119,8 +119,10 @@ resource "aws_ecs_task_definition" "this" {
                 log_stream_name: "adot-{TaskId}"
                 # log_retention: not set here — managed by aws_cloudwatch_log_group
                 # in Terraform so retention is consistent and version-controlled
-
+            extensions:
+              health_check:
             service:
+              extensions: [health_check]
               pipelines:
                 traces:
                   receivers:  [otlp]
@@ -151,7 +153,7 @@ resource "aws_ecs_task_definition" "this" {
       }
 
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:13133/ || exit 1"]
+        command     = ["CMD", "/healthcheck"]
         interval    = 5
         timeout     = 3
         retries     = 3
@@ -203,6 +205,13 @@ resource "aws_ecs_task_definition" "this" {
           "awslogs-region"        = var.aws_region
           "awslogs-stream-prefix" = "app"
         }
+      }
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -f http://localhost:${var.app_port}/health || exit 1"]
+        interval    = 20
+        timeout     = 5
+        retries     = 3
+        startPeriod = 20
       }
 
       # App waits for ADOT to be healthy before starting.
